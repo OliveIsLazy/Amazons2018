@@ -1,0 +1,3 @@
+chessGUI => JPanel to represent the chess board
+HumanPlayer => Store data about itself
+Game => Store data about the game + main game loop that updates chessGUI

@@ -16,4 +16,6 @@
 
     `java -ea runthis [options]`
 
-    e.g. `java -ea runthis human bot 10 10` _Case Sensitive_
+    e.g. `java -ea runthis human bot 10 10 Random` _Case Sensitive_
+
+    [options] : [human/bot] [human/bot] [int 1-10] [int 1-10] [Random/MiniMax]

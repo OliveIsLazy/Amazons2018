@@ -1,14 +1,24 @@
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
+import java.util.function.Supplier;
 
 public class BotPlayer extends Player{// implements Runnable{
 
     public Position move;
+    public Position shot;
     public Piece pawn;
-    Random rand = new Random();
+    private HashMap<String, Supplier<ArrayList<Position>>> algorithms = new HashMap<>();
+    public String algorithm;
+    private Random rand = new Random();
 
-    BotPlayer(Color color){
+    BotPlayer(Color color, String algorithm){
         super(color);
+        this.algorithm = algorithm;
+        algorithms.put("Random", () -> runRandom());
+        //algorithms.put("MiniMax", () -> runMiniMax());
+        //Add conversion from GameTile array to int array
     }
 
     /*
@@ -19,19 +29,33 @@ public class BotPlayer extends Player{// implements Runnable{
     *return: void
     */
     public void run(){
-        pawn = this.pawns.get(rand.nextInt(4));
-        move = pawn.movesPool.get(rand.nextInt(pawn.movesPool.size()));
+        ArrayList<Position> move_and_shot = algorithms.get(algorithm).get();
+        if(move_and_shot.size() == 2){
+            this.move = move_and_shot.get(0);
+            this.shot = move_and_shot.get(1);
+        } else if(move_and_shot.size() < 2){
+            this.move = move_and_shot.get(0);
+        } else {
+            System.out.println("There's a bug here");
+        }
     }
-    
-    /*
-    *input: void
-    *   Called from Game.letBotMakeItsMove()
-    *   Calls upon BotPlayer.run() and returns the result of it
-    *return: void
-    */
-    public Position findMove(){
-        run();
-        return move;
+
+    public void runAgain(){
+        ArrayList<Position> move_and_shot = algorithms.get(algorithm).get();
+        this.shot = move_and_shot.get(0);
     }
+
+    public ArrayList<Position> runRandom(){
+        ArrayList<Position> returnValue = new ArrayList<Position>();
+        this.pawn = this.pawns.get(rand.nextInt(4));
+        returnValue.add(pawn.movesPool.get(rand.nextInt(pawn.movesPool.size())));
+        return returnValue;
+    }
+
+    /*public ArrayList<Position> runMiniMax(){
+        MiniMax miniMax = new MiniMax(board, (color.equals(Color.BLACK)) ? "Black" : "White", 3);
+        this.pawn = this.pawns.get(rand.nextInt(4));
+        return miniMax.bestMove;
+    }*/
     
 }

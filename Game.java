@@ -9,10 +9,10 @@ public class Game {
     private GameTile[][] chessBoard;
     private JLabel message;
     
-    Game(String player1, String player2, String width, String height){
+    Game(String player1, String player2, String width, String height, String algorithm){
         //Creates 2 players as requested by args
-        Player white = player1.equals("bot") ? new BotPlayer(Color.WHITE) : new HumanPlayer(Color.WHITE);
-        Player black = player2.equals("bot") ? new BotPlayer(Color.BLACK) : new HumanPlayer(Color.BLACK);
+        Player white = player1.equals("bot") ? new BotPlayer(Color.WHITE, algorithm) : new HumanPlayer(Color.WHITE);
+        Player black = player2.equals("bot") ? new BotPlayer(Color.BLACK, algorithm) : new HumanPlayer(Color.BLACK);
         players.put("White", white);
         players.put("Black", black);
         //Builds ChessGUI.chessBoardTiles array
@@ -177,23 +177,23 @@ public class Game {
         assert(players.get(playing) instanceof BotPlayer);
         BotPlayer bot = (BotPlayer) players.get(playing);
         //compute move
-        Position move = bot.findMove();
+        bot.run();
         //execute the move
             //remove pawn from current spot
         Piece piece = chessBoard[bot.pawn.position.width][bot.pawn.position.height].removePiece();
             //move it to next spot
-        chessBoard[move.width][move.height].setPiece(piece);
+        chessBoard[bot.move.width][bot.move.height].setPiece(piece);
             //compute all new moves
         findAllPaths();
-        System.out.println(move);
+        System.out.println(bot.move);
         //compute shot
-        Position shot = bot.findMove();
+        if(bot.algorithm.equals("Random")) bot.runAgain();
         //execute the shot
             //shoot at tile
-        chessBoard[shot.width][shot.height].wasShot();
+        chessBoard[bot.shot.width][bot.shot.height].wasShot();
             //compute all new moves
         findAllPaths();
-        System.out.println(shot);
+        System.out.println(bot.shot);
         //switch players
         switchPlayer();
     }

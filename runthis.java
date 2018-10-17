@@ -19,7 +19,8 @@ public class runthis {
             @Override
             public void run() {
                 Game game = new Game(args[0], args[1], args[2], args[3]);
-                ChessGUI cg = new ChessGUI(game.getBoard(), game.getMessage());
+                ChessGUI cg = new ChessGUI(game);
+                game.setImages(cg.getImages());
                 
                 JFrame f = new JFrame("ChessChamp");
                 f.add(cg.getGui());

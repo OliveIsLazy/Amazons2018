@@ -17,21 +17,19 @@ public class GameTile extends JButton{
     Piece piece;
     Color defaultColor;
     Game parentGame;
-    int x, y;
+    Position position;
 
-    GameTile(Color color, int i, int j, Game game){
+    GameTile(Color color, int j, int i, Game game){
         super();
         this.setMargin(new Insets(0, 0, 0, 0)); //sets icon to have no margin
         this.setIcon(defaultIcon);
         this.setBackground(color);
         defaultColor = color;
         parentGame = game;
-        x = i;
-        y = j;
+        position = new Position(j, i);
         this.setAction(new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("selected button");
                 notifySelection();
             }
         });
@@ -87,6 +85,7 @@ public class GameTile extends JButton{
         hasPiece = true;
         this.piece = piece;
         this.setIcon(piece.icon);
+        piece.setPosition(this.position);
     }
 
     /*

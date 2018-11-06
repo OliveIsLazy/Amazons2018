@@ -8,7 +8,7 @@ public class runthis {
 
         //args handler
         try{
-            assert(args.length == 4);
+            assert(args.length == 5);
         } catch (AssertionError e) {
             System.out.println("Parameters: [player type] [player type] [board width] [board height]");
             System.exit(1);
@@ -18,8 +18,9 @@ public class runthis {
 
             @Override
             public void run() {
-                Game game = new Game(args[0], args[1], args[2], args[3]);
-                ChessGUI cg = new ChessGUI(game.getBoard(), game.getMessage());
+                Game game = new Game(args[0], args[1], args[2], args[3], args[4]);
+                ChessGUI cg = new ChessGUI(game);
+                game.setImages(cg.getImages());
                 
                 JFrame f = new JFrame("ChessChamp");
                 f.add(cg.getGui());

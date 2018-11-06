@@ -5,6 +5,8 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 import java.net.URL;
+import java.util.HashMap;
+
 import javax.imageio.ImageIO;
 
 public class ChessGUI {
@@ -13,17 +15,19 @@ public class ChessGUI {
     public static final int QUEEN = 0;
     public static final int BLACK = 0, WHITE = 1, IMAGE_SIZE = 64;
     public static int BOARDSIZE;
+    public static HashMap<String, Image> chessPieceImages = new HashMap<String, Image>();
+
     private final JPanel gui = new JPanel(new BorderLayout(3, 3));
     private GameTile[][] chessBoardSquares;
-    private Image[][] chessPieceImages = new Image[2][6];
     private JPanel chessBoard;
     private JLabel message;
+    private Game parentGame;
     
-    ChessGUI(GameTile[][] b, JLabel m) {
-        BOARDSIZE = b.length;
-
-        chessBoardSquares = b; //Game tiles created by the game
-        message = m; //Message showing whos move it is etc
+    ChessGUI(Game game){
+        this.parentGame = game;
+        BOARDSIZE = game.getBoard().length;
+        chessBoardSquares = game.getBoard(); //Game tiles created by the game
+        message = game.getMessage(); //Message showing whos move it is etc
         initializeGui();
     }
 
@@ -42,16 +46,17 @@ public class ChessGUI {
         return gui;
     }
 
+    public final HashMap<String, Image> getImages(){
+        return chessPieceImages;
+    }
+
     private final void createImages() {
         try {
             URL url = new URL("http://i.stack.imgur.com/memI0.png");
             BufferedImage bi = ImageIO.read(url);
-            for (int ii = 0; ii < 2; ii++) {
-                for (int jj = 0; jj < 6; jj++) {
-                    chessPieceImages[ii][jj] = bi.getSubimage(
-                            jj * IMAGE_SIZE, ii * IMAGE_SIZE, IMAGE_SIZE, IMAGE_SIZE);
-                }
-            }
+            chessPieceImages.put("Black", bi.getSubimage(0, 0, IMAGE_SIZE, IMAGE_SIZE));
+            chessPieceImages.put("White", bi.getSubimage(0, IMAGE_SIZE, IMAGE_SIZE, IMAGE_SIZE));
+
         } catch (Exception e) {
             //e.printStackTrace();
             System.out.println("Game images couldn't be found.");
@@ -176,15 +181,6 @@ public class ChessGUI {
                     tile.empty();
         }
         message.setText("White's move!");
-        // set up the black pieces
-        chessBoardSquares[2][0].setPiece(new Piece(new ImageIcon(chessPieceImages[BLACK][QUEEN]), Color.BLACK));
-        chessBoardSquares[BOARDSIZE-3][0].setPiece(new Piece(new ImageIcon(chessPieceImages[BLACK][QUEEN]), Color.BLACK));
-        chessBoardSquares[0][2].setPiece(new Piece(new ImageIcon(chessPieceImages[BLACK][QUEEN]), Color.BLACK));
-        chessBoardSquares[BOARDSIZE-1][2].setPiece(new Piece(new ImageIcon(chessPieceImages[BLACK][QUEEN]), Color.BLACK));
-        
-        chessBoardSquares[0][BOARDSIZE-3].setPiece(new Piece(new ImageIcon(chessPieceImages[WHITE][QUEEN]), Color.WHITE));
-        chessBoardSquares[BOARDSIZE-1][BOARDSIZE-3].setPiece(new Piece(new ImageIcon(chessPieceImages[WHITE][QUEEN]), Color.WHITE));
-        chessBoardSquares[2][BOARDSIZE-1].setPiece(new Piece(new ImageIcon(chessPieceImages[WHITE][QUEEN]), Color.WHITE));
-        chessBoardSquares[BOARDSIZE-3][BOARDSIZE-1].setPiece(new Piece(new ImageIcon(chessPieceImages[WHITE][QUEEN]), Color.WHITE));
+        this.parentGame.startNewGame();
     }
 }

@@ -18,7 +18,7 @@ public class Game {
         players.put("White", white);
         players.put("Black", black);
         //ChessGUI.message
-        message = new JLabel("Chess Champ is ready to play!");
+        message = new JLabel();
     }
 
     /*
@@ -143,9 +143,11 @@ public class Game {
     public void startNewGame(){
         int BOARDSIZE = chessBoard.length;
         // create and assign pawns to the players
-        for(String key : players.keySet().toArray(new String[players.size()]))
+        for(String key : players.keySet().toArray(new String[players.size()])){
+            players.get(key).pawns.clear();
             for(int i = 0; i < 4; i++)
                 players.get(key).pawns.add(new Piece(new ImageIcon(pieceImages.get(key)), (key=="Black")?Color.BLACK:Color.WHITE, chessBoard));
+        }
         // set up the black pieces
         chessBoard[2][0].setPiece(players.get("Black").pawns.get(0));
         chessBoard[BOARDSIZE-3][0].setPiece(players.get("Black").pawns.get(1));
@@ -158,6 +160,10 @@ public class Game {
         chessBoard[BOARDSIZE-3][BOARDSIZE-1].setPiece(players.get("White").pawns.get(3));
         // initialize the pawns move pools
         findAllPaths();
+        
+        // initialize other variables
+        playing = "White";
+        message.setText("Chess Champ is ready to play!");
     }
 
     /*

@@ -3,7 +3,9 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 import javax.swing.border.*;
-
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 
@@ -78,7 +80,15 @@ public class ChessGUI {
             
         };
         tools.add(newGameAction);
-        tools.add(new JButton("Save")); // TO.DO - add functionality!
+        Action newSaveAction = new AbstractAction("Save"){
+        
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                saveGame();
+            }
+            
+        };
+        tools.add(newSaveAction);
         tools.add(new JButton("Restore")); // TO.DO - add functionality!
         tools.addSeparator();
         tools.add(new JButton("Resign")); // TO.DO - add functionality!
@@ -182,5 +192,38 @@ public class ChessGUI {
         }
         message.setText("White's move!");
         this.parentGame.startNewGame();
+    }
+
+    /**
+     * Pops up a FileChooser and saves game to the selected file
+     */
+    private final void saveGame(){
+        JFileChooser fc = new JFileChooser();
+        int returnVal = fc.showDialog(this.gui, "Save");
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = fc.getSelectedFile(); //TODO: make idiot proof by giving it specific .amazon format out of the box
+            try{
+                //TODO: add possibility to save to an already existing game file
+                boolean created = file.createNewFile();
+                if(created){
+                    //Write board content etc to the file
+                    System.out.println("Opening: " + file.getName());
+                    FileWriter writer = new FileWriter(file);
+                    writer.write("Hello world!"); //TODO: save the game state and game log to a fictional_name.amazon file
+                    writer.flush();
+                    writer.close();
+                    //popup saying it was saved successfully
+                    JOptionPane.showMessageDialog(this.gui, "Game was saved successfully.");
+                }
+                else {
+                    //File already exists, popup saying file couln't be saved
+                    JOptionPane.showMessageDialog(this.gui, file.getName() + " already exists.\nPlease specify a new file name.");
+                }
+            } catch (IOException e) {
+                System.out.println(e.toString());
+            }
+        } else {
+            System.out.println("Open command cancelled by user.");
+        }
     }
 }

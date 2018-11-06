@@ -1,3 +1,12 @@
 chessGUI => JPanel to represent the chess board
 HumanPlayer => Store data about itself
 Game => Store data about the game + main game loop that updates chessGUI
+
+TODO: 
+    * New Button (Fix bug in it => Throws null pointer when Piece.findPaths() is called)
+    * Save Button (Saves specific game state to be restarted later)
+    * Load/Restore Button (Loads specific game file)
+    * Resign Button (Gives up game, sets top message)
+    * Back Button (Restores the game to the previous move)
+    * Moves Logger option from command line (Gives UI a scrollable list of all previously played moves)
+    * UI enabled optioin for command line (Gives the possibility to take away UI i.e. go headless)

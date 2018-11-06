@@ -18,6 +18,8 @@ public class runthis {
 
             @Override
             public void run() {
+                try { UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName() ); } catch (Exception e) { e.printStackTrace(); } //cross platform UI
+
                 Game game = new Game(args[0], args[1], args[2], args[3], args[4]);
                 ChessGUI cg = new ChessGUI(game);
                 game.setImages(cg.getImages());

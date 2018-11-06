@@ -24,6 +24,8 @@ public class GameTile extends JButton{
         this.setMargin(new Insets(0, 0, 0, 0)); //sets icon to have no margin
         this.setIcon(defaultIcon);
         this.setBackground(color);
+        //this.setOpaque(true);
+        //this.setBorderPainted(false);
         defaultColor = color;
         parentGame = game;
         position = new Position(j, i);

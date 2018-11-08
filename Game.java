@@ -6,10 +6,9 @@ import java.util.Stack;
 public class Game {
     private HashMap<String, Player> players = new HashMap<String, Player>();
     private String playing = "White";
-    private HashMap<String, Image> pieceImages;
-    private Board chessBoard;
+    public static Board chessBoard;
     private JLabel message;
-    private Stack<> history;
+    private Stack<String> history;
 
     Game(String player1, String player2, String width, String height, String algorithm) {
         // Builds ChessGUI.chessBoardTiles array
@@ -23,6 +22,7 @@ public class Game {
         players.put("Black", black);
         // ChessGUI.message
         message = new JLabel();
+        history = new Stack();
     }
 
     /*
@@ -110,6 +110,7 @@ public class Game {
      * accordance. Used to switch player turns return: void
      */
     private void switchPlayer() {
+        history.push(chessBoard.encode());
         String next = playing;
         if (playing == "White")
             next = "Black";
@@ -132,13 +133,6 @@ public class Game {
         chessBoard.clear();
         if (!chessBoard.enabled)
             chessBoard.enable();
-        // create and assign pawns to the players
-        for (String key : players.keySet().toArray(new String[players.size()])) {
-            players.get(key).pawns.clear();
-            for (int i = 0; i < 4; i++)
-                players.get(key).pawns.add(new Piece(new ImageIcon(pieceImages.get(key)),
-                        (key == "Black") ? Color.BLACK : Color.WHITE, chessBoard.tiles));
-        }
         // set up the black pieces
         chessBoard.tiles[2][0].setPiece(players.get("Black").pawns.get(0));
         chessBoard.tiles[BOARDSIZE - 3][0].setPiece(players.get("Black").pawns.get(1));
@@ -155,14 +149,15 @@ public class Game {
         // initialize other variables
         playing = "White";
         message.setText("Chess Champ is ready to play!");
-        history = new Stack();
+        history.empty();
+        history.push(chessBoard.encode());
     }
 
     /*
      * input: void Finds all the possible paths of all the pieces by calling
      * Piece.findPaths() on all the pieces return: void
      */
-    private void findAllPaths() {
+    public void findAllPaths() {
         // initialize the pawns move pools
         for (String key : players.keySet().toArray(new String[players.size()]))
             for (Piece piece : players.get(key).pawns)
@@ -196,35 +191,47 @@ public class Game {
     }
 
     /**
+     * Shifts game back one move
+     */
+    public boolean moveBack() {
+        if (history.empty() || history.size() <= 1)
+            return false;
+        if (players.get(playing).state == "Moving")
+            history.remove(history.size() - 1);
+        if (chessBoard.decode(history.pop())) {
+            System.out.println("Moving back");
+            switchPlayer();
+            return true;
+        } else
+            return false;
+    }
+
+    /**
      * Ends game by setting message to winner color and disabling input
      */
     public void endGame(String next) {
         this.message.setText(next + " won");
         // disable the board
-        this.chessBoard.disable();
+        chessBoard.disable();
     }
 
     public void endGame() {
         this.message.setText(playing + " has resigned.");
         // disable the board
-        this.chessBoard.disable();
+        chessBoard.disable();
     }
 
     // Getters
     public final Board getBoard() {
-        return this.chessBoard;
+        return chessBoard;
     }
 
     public final JLabel getMessage() {
         return this.message;
     }
 
-    // Setters
-    public final void setImages(HashMap<String, Image> images) {
-        this.pieceImages = images;
+    public final Player getPlayer(String color) {
+        return players.get(color);
     }
 
-    public final void setBoard(Board b) {
-        this.chessBoard = b;
-    }
 }

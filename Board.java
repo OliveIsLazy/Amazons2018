@@ -6,12 +6,14 @@ public class Board {
     public GameTile[][] tiles;
     public int size;
     public boolean enabled = true;
+    private Game parentGame;
 
     /*
      * input: number of columns, number of rows Builds a args[2] x args[3] size
      * chess board using GameTiles return: void
      */
     Board(Integer width, Integer height, Game game) {
+        parentGame = game;
         size = width.intValue();
         this.tiles = new GameTile[width.intValue()][height.intValue()];
         for (int ii = 0; ii < this.tiles.length; ii++) {
@@ -24,10 +26,6 @@ public class Board {
         }
     }
 
-    Board(String board) {
-        this.decode(board);
-    }
-
     public String encode() {
         String board = "";
         for (GameTile[] row : tiles) {
@@ -35,19 +33,45 @@ public class Board {
                 if (tile.wasShot)
                     board += "a";
                 else if (tile.hasPiece)
-                    board += "p";
+                    board += (tile.piece.color == Color.black) ? "b" : "w";
                 else
                     board += "e";
             }
         }
-        System.out.println(board);
         return board;
     }
 
-    private void decode(String board) {
-        System.out.println(board);
-        // TODO: implement loading of a game
-        // this.size = this.tiles = new GameTile[size][size];
+    public boolean decode(String board) {
+        try {
+            assert (board.length() == tiles.length * tiles[0].length);
+            int index, black_index, white_index;
+            index = black_index = white_index = 0;
+            GameTile[][] newTiles = tiles.clone();
+            for (GameTile[] row : newTiles) {
+                for (GameTile tile : row) {
+                    switch (board.charAt(index)) {
+                    case 'a':
+                        tile.shoot();
+                        break;
+                    case 'b':
+                        tile.setPiece(this.parentGame.getPlayer("Black").pawns.get(black_index));
+                        black_index++;
+                        break;
+                    case 'w':
+                        tile.setPiece(this.parentGame.getPlayer("White").pawns.get(white_index));
+                        white_index++;
+                        break;
+                    }
+                    index++;
+                }
+            }
+            assert (black_index == 4 && white_index == 4);
+            tiles = newTiles;
+            this.parentGame.findAllPaths();
+            return true;
+        } catch (AssertionError e) {
+            return false;
+        }
     }
 
     /*

@@ -8,17 +8,18 @@ public class Piece {
     Color color;
     Position position;
     ArrayList<Position> movesPool = new ArrayList<Position>();
-    GameTile[][] chessBoard;
 
-    Piece(Icon i, Color c, GameTile[][] b) {
-        icon = i;
+    Piece(Color c) {
         color = c;
-        chessBoard = b;
+    }
+
+    public final void setImage(ImageIcon image) {
+        this.icon = image;
     }
 
     public void showPaths() {
         for (Position pos : this.movesPool)
-            chessBoard[pos.width][pos.height].changeColor(true);
+            Game.chessBoard.tiles[pos.width][pos.height].changeColor(true);
     }
 
     /*
@@ -30,24 +31,26 @@ public class Piece {
         boolean top_flag, bottom_flag, right_flag, left_flag, bottom_right_flag, top_right_flag, bottom_left_flag,
                 top_left_flag;
         top_flag = bottom_flag = right_flag = left_flag = bottom_right_flag = top_right_flag = bottom_left_flag = top_left_flag = false;
-        for (int i = 1; i < chessBoard.length; i++) {
+        for (int i = 1; i < Game.chessBoard.tiles.length; i++) {
             // vertical and horizontal paths
             top_flag = conditionalAdditionToMovesPool(this.position.width - i, this.position.height,
                     this.position.width - i >= 0, top_flag);
             bottom_flag = conditionalAdditionToMovesPool(this.position.width + i, this.position.height,
-                    this.position.width + i < chessBoard.length, bottom_flag);
+                    this.position.width + i < Game.chessBoard.tiles.length, bottom_flag);
             right_flag = conditionalAdditionToMovesPool(this.position.width, this.position.height + i,
-                    this.position.height + i < chessBoard[i].length, right_flag);
+                    this.position.height + i < Game.chessBoard.tiles[i].length, right_flag);
             left_flag = conditionalAdditionToMovesPool(this.position.width, this.position.height - i,
                     this.position.height - i >= 0, left_flag);
             // diagonal paths
             bottom_right_flag = conditionalAdditionToMovesPool(this.position.width + i, this.position.height + i,
-                    (this.position.width + i < chessBoard.length && this.position.height + i < chessBoard[i].length),
+                    (this.position.width + i < Game.chessBoard.tiles.length
+                            && this.position.height + i < Game.chessBoard.tiles[i].length),
                     bottom_right_flag);
             top_right_flag = conditionalAdditionToMovesPool(this.position.width + i, this.position.height - i,
-                    (this.position.width + i < chessBoard.length && this.position.height - i >= 0), top_right_flag);
+                    (this.position.width + i < Game.chessBoard.tiles.length && this.position.height - i >= 0),
+                    top_right_flag);
             bottom_left_flag = conditionalAdditionToMovesPool(this.position.width - i, this.position.height + i,
-                    (this.position.width - i >= 0 && this.position.height + i < chessBoard[i].length),
+                    (this.position.width - i >= 0 && this.position.height + i < Game.chessBoard.tiles[i].length),
                     bottom_left_flag);
             top_left_flag = conditionalAdditionToMovesPool(this.position.width - i, this.position.height - i,
                     (this.position.width - i >= 0 && this.position.height - i > 0), top_left_flag);
@@ -63,10 +66,10 @@ public class Piece {
      */
     boolean conditionalAdditionToMovesPool(int i_index, int j_index, boolean index_check, boolean flag) {
         if (index_check && !flag) {
-            if (chessBoard[i_index][j_index].hasPiece || chessBoard[i_index][j_index].wasShot) {
+            if (Game.chessBoard.tiles[i_index][j_index].hasPiece || Game.chessBoard.tiles[i_index][j_index].wasShot) {
                 return true;
             } else {
-                this.movesPool.add(chessBoard[i_index][j_index].position);
+                this.movesPool.add(Game.chessBoard.tiles[i_index][j_index].position);
             }
         }
         return flag;

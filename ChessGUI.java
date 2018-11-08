@@ -37,6 +37,7 @@ public class ChessGUI {
     public final void initializeGui() {
         // create the images for the chess pieces
         createImages();
+        setPieceImages();
 
         // set up the main GUI
         setUpGUI();
@@ -51,6 +52,11 @@ public class ChessGUI {
 
     public final HashMap<String, Image> getImages() {
         return chessPieceImages;
+    }
+
+    private final void setPieceImages() {
+        parentGame.getPlayer("Black").setImage(new ImageIcon(chessPieceImages.get("Black")));
+        parentGame.getPlayer("White").setImage(new ImageIcon(chessPieceImages.get("White")));
     }
 
     private final void createImages() {
@@ -81,6 +87,7 @@ public class ChessGUI {
 
         };
         tools.add(newGameAction);
+        tools.addSeparator();
         Action newSaveAction = new AbstractAction("Save") {
 
             @Override
@@ -106,7 +113,17 @@ public class ChessGUI {
                 parentGame.endGame();
             }
         };
-        tools.add(newResignAction); // TO.DO - add functionality!
+        tools.add(newResignAction);
+        tools.addSeparator();
+        Action newBackAction = new AbstractAction("Back") {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!parentGame.moveBack())
+                    JOptionPane.showMessageDialog(gui, "Cannot go back further.");
+            }
+        };
+        tools.add(newBackAction);
         tools.addSeparator();
         tools.add(message);
 
@@ -188,7 +205,7 @@ public class ChessGUI {
     /**
      * Initializes the icons of the initial chess board piece places
      */
-    private final void setupNewGame() {
+    public final void setupNewGame() {
         try {
             board.assertEmptiness();
         } catch (AssertionError e) {
@@ -253,7 +270,7 @@ public class ChessGUI {
                     reader.close();
                     // transform string into Board class
                     System.out.println(boardString);
-                    game.setBoard(new Board(boardString));
+                    assert (parentGame.getBoard().decode(boardString));
                     // popup saying it was saved successfully
                     JOptionPane.showMessageDialog(this.gui, "Game was loaded successfully.");
                 } else {
@@ -263,6 +280,9 @@ public class ChessGUI {
                 }
             } catch (IOException e) {
                 System.out.println(e.toString());
+            } catch (AssertionError e) {
+                JOptionPane.showMessageDialog(this.gui,
+                        file.getName() + " is not a valid game file.\nPlease specify a new file name.");
             }
         } else {
             System.out.println("Open command cancelled by user.");

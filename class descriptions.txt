@@ -3,7 +3,6 @@ HumanPlayer => Store data about itself
 Game => Store data about the game + main game loop that updates chessGUI
 
 TODO: 
-    * Back Button (Restores the game to the previous move)
     * Moves Logger option from command line (Gives UI a scrollable list of all previously played moves)
     * UI enabled option for command line (Gives the possibility to take away UI i.e. go headless)
 

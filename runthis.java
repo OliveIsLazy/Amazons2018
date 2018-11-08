@@ -6,9 +6,9 @@ public class runthis {
 
     public static void main(String[] args) {
 
-        //args handler
-        try{
-            assert(args.length == 5);
+        // args handler
+        try {
+            assert (args.length == 5);
         } catch (AssertionError e) {
             System.out.println("Parameters: [player type] [player type] [board width] [board height]");
             System.exit(1);
@@ -18,12 +18,15 @@ public class runthis {
 
             @Override
             public void run() {
-                try { UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName() ); } catch (Exception e) { e.printStackTrace(); } //cross platform UI
+                try {
+                    UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } // cross platform UI
 
                 Game game = new Game(args[0], args[1], args[2], args[3], args[4]);
                 ChessGUI cg = new ChessGUI(game);
-                game.setImages(cg.getImages());
-                
+
                 JFrame f = new JFrame("ChessChamp");
                 f.add(cg.getGui());
                 // Ensures JVM closes after frame(s) closed

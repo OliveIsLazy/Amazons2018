@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
@@ -20,16 +21,16 @@ public class ChessGUI {
     public static HashMap<String, Image> chessPieceImages = new HashMap<String, Image>();
 
     private final JPanel gui = new JPanel(new BorderLayout(3, 3));
-    private GameTile[][] chessBoardSquares;
+    private Board board;
     private JPanel chessBoard;
     private JLabel message;
     private Game parentGame;
-    
-    ChessGUI(Game game){
+
+    ChessGUI(Game game) {
         this.parentGame = game;
-        BOARDSIZE = game.getBoard().length;
-        chessBoardSquares = game.getBoard(); //Game tiles created by the game
-        message = game.getMessage(); //Message showing whos move it is etc
+        BOARDSIZE = game.getBoard().tiles.length;
+        board = game.getBoard(); // Game tiles created by the game
+        message = game.getMessage(); // Message showing whos move it is etc
         initializeGui();
     }
 
@@ -48,7 +49,7 @@ public class ChessGUI {
         return gui;
     }
 
-    public final HashMap<String, Image> getImages(){
+    public final HashMap<String, Image> getImages() {
         return chessPieceImages;
     }
 
@@ -60,13 +61,13 @@ public class ChessGUI {
             chessPieceImages.put("White", bi.getSubimage(0, IMAGE_SIZE, IMAGE_SIZE, IMAGE_SIZE));
 
         } catch (Exception e) {
-            //e.printStackTrace();
+            // e.printStackTrace();
             System.out.println("Game images couldn't be found.");
             System.exit(1);
         }
     }
 
-    private final void setUpGUI(){
+    private final void setUpGUI() {
         gui.setBorder(new EmptyBorder(5, 5, 5, 5));
         JToolBar tools = new JToolBar();
         tools.setFloatable(false);
@@ -77,34 +78,48 @@ public class ChessGUI {
             public void actionPerformed(ActionEvent e) {
                 setupNewGame();
             }
-            
+
         };
         tools.add(newGameAction);
-        Action newSaveAction = new AbstractAction("Save"){
-        
+        Action newSaveAction = new AbstractAction("Save") {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 saveGame();
             }
-            
+
         };
         tools.add(newSaveAction);
-        tools.add(new JButton("Restore")); // TO.DO - add functionality!
+        Action newLoadAction = new AbstractAction("Load Game") {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loadGame();
+            }
+        };
+        tools.add(newLoadAction);
         tools.addSeparator();
-        tools.add(new JButton("Resign")); // TO.DO - add functionality!
+        Action newResignAction = new AbstractAction("Resign") {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                parentGame.endGame();
+            }
+        };
+        tools.add(newResignAction); // TO.DO - add functionality!
         tools.addSeparator();
         tools.add(message);
 
     }
 
-    private final void makeChessBoard(){
-        chessBoard = new JPanel(new GridLayout(BOARDSIZE + 2, 0)) { // + 2 because there's 2 columns and 2 rows on each side of the board
+    private final void makeChessBoard() {
+        chessBoard = new JPanel(new GridLayout(BOARDSIZE + 2, 0)) { // + 2 because there's 2 columns and 2 rows on each
+                                                                    // side of the board
 
             /**
-             * Override the preferred size to return the largest it can, in
-             * a square shape.  Must (must, must) be added to a GridBagLayout
-             * as the only component (it uses the parent as a guide to size)
-             * with no GridBagConstaint (so it is centered).
+             * Override the preferred size to return the largest it can, in a square shape.
+             * Must (must, must) be added to a GridBagLayout as the only component (it uses
+             * the parent as a guide to size) with no GridBagConstaint (so it is centered).
              */
             @Override
             public final Dimension getPreferredSize() {
@@ -112,11 +127,8 @@ public class ChessGUI {
                 Dimension prefSize = null;
                 Component c = getParent();
                 if (c == null) {
-                    prefSize = new Dimension(
-                            (int)d.getWidth(),(int)d.getHeight());
-                } else if (c!=null &&
-                        c.getWidth()>d.getWidth() &&
-                        c.getHeight()>d.getHeight()) {
+                    prefSize = new Dimension((int) d.getWidth(), (int) d.getHeight());
+                } else if (c != null && c.getWidth() > d.getWidth() && c.getHeight() > d.getHeight()) {
                     prefSize = c.getSize();
                 } else {
                     prefSize = d;
@@ -124,20 +136,15 @@ public class ChessGUI {
                 int w = (int) prefSize.getWidth();
                 int h = (int) prefSize.getHeight();
                 // the smaller of the two sizes
-                int s = (w>h ? h : w);
-                return new Dimension(s,s);
+                int s = (w > h ? h : w);
+                return new Dimension(s, s);
             }
         };
         // Create board contour/border
-        chessBoard.setBorder(
-            new CompoundBorder(
-                new EmptyBorder(8,8,8,8),
-                new LineBorder(Color.BLACK)
-            )
-        );
+        chessBoard.setBorder(new CompoundBorder(new EmptyBorder(8, 8, 8, 8), new LineBorder(Color.BLACK)));
 
         // Set the BG to be ochre
-        Color ochre = new Color(204,119,34);
+        Color ochre = new Color(204, 119, 34);
         chessBoard.setBackground(ochre);
         JPanel boardConstrain = new JPanel(new GridBagLayout());
         boardConstrain.setBackground(ochre);
@@ -150,22 +157,22 @@ public class ChessGUI {
         // fill the top row
         chessBoard.add(new JLabel(""));
         for (int ii = 0; ii < BOARDSIZE; ii++)
-            chessBoard.add(new JLabel(COLS.substring(ii, ii + 1), SwingConstants.CENTER)); // Horiztontal legend A to J on 10x10
+            chessBoard.add(new JLabel(COLS.substring(ii, ii + 1), SwingConstants.CENTER)); // Horiztontal legend A to J
+                                                                                           // on 10x10
         chessBoard.add(new JLabel(""));
 
-        // fill in the chess board (first and last index of the row is the vertical legend of the board)
+        // fill in the chess board (first and last index of the row is the vertical
+        // legend of the board)
         for (int ii = 0; ii < BOARDSIZE; ii++) {
             for (int jj = 0; jj < BOARDSIZE; jj++) {
-                if(jj==0) {
-                    chessBoard.add(new JLabel("" + (BOARDSIZE+1-(ii + 1)), SwingConstants.CENTER));
-                    chessBoard.add(chessBoardSquares[jj][ii]);
-                }
-                else if(jj==BOARDSIZE-1){
-                    chessBoard.add(chessBoardSquares[jj][ii]);
-                    chessBoard.add(new JLabel("" + (BOARDSIZE+1-(ii + 1)), SwingConstants.CENTER));
-                }
-                else {
-                    chessBoard.add(chessBoardSquares[jj][ii]);
+                if (jj == 0) {
+                    chessBoard.add(new JLabel("" + (BOARDSIZE + 1 - (ii + 1)), SwingConstants.CENTER));
+                    chessBoard.add(board.tiles[jj][ii]);
+                } else if (jj == BOARDSIZE - 1) {
+                    chessBoard.add(board.tiles[jj][ii]);
+                    chessBoard.add(new JLabel("" + (BOARDSIZE + 1 - (ii + 1)), SwingConstants.CENTER));
+                } else {
+                    chessBoard.add(board.tiles[jj][ii]);
                 }
             }
         }
@@ -173,7 +180,8 @@ public class ChessGUI {
         // fill the bottom row
         chessBoard.add(new JLabel(""));
         for (int ii = 0; ii < BOARDSIZE; ii++)
-            chessBoard.add(new JLabel(COLS.substring(ii, ii + 1), SwingConstants.CENTER)); // Horiztontal legend A to J on 10x10
+            chessBoard.add(new JLabel(COLS.substring(ii, ii + 1), SwingConstants.CENTER)); // Horiztontal legend A to J
+                                                                                           // on 10x10
         chessBoard.add(new JLabel(""));
     }
 
@@ -181,14 +189,10 @@ public class ChessGUI {
      * Initializes the icons of the initial chess board piece places
      */
     private final void setupNewGame() {
-        try{
-            for(GameTile[] row: chessBoardSquares)
-                for(GameTile tile: row)
-                    assert(tile.hasPiece == false);
-        }catch(AssertionError e){
-            for(GameTile[] row: chessBoardSquares)
-                for(GameTile tile: row)
-                    tile.empty();
+        try {
+            board.assertEmptiness();
+        } catch (AssertionError e) {
+            board.empty();
         }
         message.setText("White's move!");
         this.parentGame.startNewGame();
@@ -197,27 +201,65 @@ public class ChessGUI {
     /**
      * Pops up a FileChooser and saves game to the selected file
      */
-    private final void saveGame(){
+    private final void saveGame() {
         JFileChooser fc = new JFileChooser();
         int returnVal = fc.showDialog(this.gui, "Save");
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File file = fc.getSelectedFile(); //TODO: make idiot proof by giving it specific .amazon format out of the box
-            try{
-                //TODO: add possibility to save to an already existing game file
+            File file = fc.getSelectedFile(); // TODO: make idiot proof by giving it specific .amazon format out of the
+                                              // box
+            try {
+                // TODO: add possibility to save to an already existing game file
                 boolean created = file.createNewFile();
-                if(created){
-                    //Write board content etc to the file
+                if (created) {
+                    // Write board content etc to the file
                     System.out.println("Opening: " + file.getName());
                     FileWriter writer = new FileWriter(file);
-                    writer.write("Hello world!"); //TODO: save the game state and game log to a fictional_name.amazon file
+                    writer.write(board.encode());
                     writer.flush();
                     writer.close();
-                    //popup saying it was saved successfully
+                    // popup saying it was saved successfully
                     JOptionPane.showMessageDialog(this.gui, "Game was saved successfully.");
+                } else {
+                    // File already exists, popup saying file couln't be saved
+                    JOptionPane.showMessageDialog(this.gui,
+                            file.getName() + " already exists.\nPlease specify a new file name.");
                 }
-                else {
-                    //File already exists, popup saying file couln't be saved
-                    JOptionPane.showMessageDialog(this.gui, file.getName() + " already exists.\nPlease specify a new file name.");
+            } catch (IOException e) {
+                System.out.println(e.toString());
+            }
+        } else {
+            System.out.println("Open command cancelled by user.");
+        }
+    }
+
+    /**
+     * Pops up a FileChooser and loads game from the selected file
+     */
+    private final void loadGame() {
+        JFileChooser fc = new JFileChooser();
+        int returnVal = fc.showDialog(this.gui, "Load");
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = fc.getSelectedFile(); // TODO: make idiot proof by giving it specific .amazon format out of the
+                                              // box
+            try {
+                if (file.exists()) {
+                    // Write board content etc to the file
+                    System.out.println("Opening: " + file.getName());
+                    FileReader reader = new FileReader(file);
+                    int c;
+                    String boardString = "";
+                    while ((c = reader.read()) != -1)
+                        boardString += (char) c;
+                    reader.close();
+                    // transform string into Board class
+                    System.out.println(boardString);
+                    game.setBoard(new Board(boardString));
+                    // popup saying it was saved successfully
+                    JOptionPane.showMessageDialog(this.gui, "Game was loaded successfully.");
+                } else {
+                    // File already exists, popup saying file couln't be saved
+                    JOptionPane.showMessageDialog(this.gui,
+                            file.getName() + " already exists.\nPlease specify a new file name.");
                 }
             } catch (IOException e) {
                 System.out.println(e.toString());

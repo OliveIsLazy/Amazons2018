@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -220,32 +221,25 @@ public class ChessGUI {
      */
     private final void saveGame() {
         JFileChooser fc = new JFileChooser();
+        CustomFileFilter ff = new CustomFileFilter();
+        fc.setFileFilter(ff);
         int returnVal = fc.showDialog(this.gui, "Save");
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File file = fc.getSelectedFile(); // TODO: make idiot proof by giving it specific .amazon format out of the
-                                              // box
             try {
-                // TODO: add possibility to save to an already existing game file
-                boolean created = file.createNewFile();
-                if (created) {
-                    // Write board content etc to the file
-                    System.out.println("Opening: " + file.getName());
-                    FileWriter writer = new FileWriter(file);
-                    writer.write(board.encode());
-                    writer.flush();
-                    writer.close();
-                    // popup saying it was saved successfully
-                    JOptionPane.showMessageDialog(this.gui, "Game was saved successfully.");
-                } else {
-                    // File already exists, popup saying file couln't be saved
-                    JOptionPane.showMessageDialog(this.gui,
-                            file.getName() + " already exists.\nPlease specify a new file name.");
-                }
+                File file = fc.getSelectedFile();
+                if (!file.getName().endsWith(".amazons"))
+                    file = new File(file + ".amazons");
+                // Write board content etc to the file
+                System.out.println("Opening: " + file.getName());
+                FileWriter writer = new FileWriter(file);
+                writer.write(board.encode());
+                writer.flush();
+                writer.close();
+                // popup saying it was saved successfully
+                JOptionPane.showMessageDialog(this.gui, "Game was saved successfully.");
             } catch (IOException e) {
                 System.out.println(e.toString());
             }
-        } else {
-            System.out.println("Open command cancelled by user.");
         }
     }
 
@@ -254,38 +248,30 @@ public class ChessGUI {
      */
     private final void loadGame() {
         JFileChooser fc = new JFileChooser();
+        CustomFileFilter ff = new CustomFileFilter();
+        fc.setFileFilter(ff);
         int returnVal = fc.showDialog(this.gui, "Load");
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File file = fc.getSelectedFile(); // TODO: make idiot proof by giving it specific .amazon format out of the
-                                              // box
+            File file = fc.getSelectedFile();
             try {
-                if (file.exists()) {
-                    // Write board content etc to the file
-                    System.out.println("Opening: " + file.getName());
-                    FileReader reader = new FileReader(file);
-                    int c;
-                    String boardString = "";
-                    while ((c = reader.read()) != -1)
-                        boardString += (char) c;
-                    reader.close();
-                    // transform string into Board class
-                    System.out.println(boardString);
-                    assert (parentGame.getBoard().decode(boardString));
-                    // popup saying it was saved successfully
-                    JOptionPane.showMessageDialog(this.gui, "Game was loaded successfully.");
-                } else {
-                    // File already exists, popup saying file couln't be saved
-                    JOptionPane.showMessageDialog(this.gui,
-                            file.getName() + " already exists.\nPlease specify a new file name.");
-                }
+                assert (file.exists() && file.getName().endsWith(".amazons"));
+                // Write board content etc to the file
+                FileReader reader = new FileReader(file);
+                int c;
+                String boardString = "";
+                while ((c = reader.read()) != -1)
+                    boardString += (char) c;
+                reader.close();
+                // transform string into Board class
+                assert (parentGame.getBoard().decode(boardString));
+                // popup saying it was saved successfully
+                JOptionPane.showMessageDialog(this.gui, "Game was loaded successfully.");
             } catch (IOException e) {
                 System.out.println(e.toString());
             } catch (AssertionError e) {
                 JOptionPane.showMessageDialog(this.gui,
                         file.getName() + " is not a valid game file.\nPlease specify a new file name.");
             }
-        } else {
-            System.out.println("Open command cancelled by user.");
         }
     }
 }

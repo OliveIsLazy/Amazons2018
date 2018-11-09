@@ -9,3 +9,4 @@ TODO:
 Known bugs:
     * Some moves only get counted in some instances.
     * Starting new game does NOT reset all states for players
+    * Loading an incompatible file adds unwanted arrows to the board

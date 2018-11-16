@@ -61,6 +61,8 @@ public class Board {
                         tile.setPiece(this.parentGame.getPlayer("White").pawns.get(white_index));
                         white_index++;
                         break;
+                    case 'e':
+                        tile.empty();
                     }
                     index++;
                 }

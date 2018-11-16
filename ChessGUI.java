@@ -68,7 +68,6 @@ public class ChessGUI {
             chessPieceImages.put("White", bi.getSubimage(0, IMAGE_SIZE, IMAGE_SIZE, IMAGE_SIZE));
 
         } catch (Exception e) {
-            // e.printStackTrace();
             System.out.println("Game images couldn't be found.");
             System.exit(1);
         }
@@ -212,7 +211,6 @@ public class ChessGUI {
         } catch (AssertionError e) {
             board.empty();
         }
-        message.setText("White's move!");
         this.parentGame.startNewGame();
     }
 

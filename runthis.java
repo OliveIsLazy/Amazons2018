@@ -6,40 +6,42 @@ public class runthis {
 
     public static void main(String[] args) {
 
-        // args handler
-        try {
-            assert (args.length == 5);
-        } catch (AssertionError e) {
-            System.out.println("Parameters: [player type] [player type] [board width] [board height]");
-            System.exit(1);
-        }
-
         Runnable r = new Runnable() {
 
             @Override
             public void run() {
+                ArgParser parser = new ArgParser();
+
                 try {
-                    UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+                    assert parser.parse(args);
+                    UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName()); // cross platform UI
                 } catch (Exception e) {
                     e.printStackTrace();
-                } // cross platform UI
+                } catch (AssertionError ae) {
+                    System.exit(1);
+                }
 
-                Game game = new Game(args[0], args[1], args[2], args[3], args[4]);
-                ChessGUI cg = new ChessGUI(game);
+                Game game = new Game(parser.getCommands());
+                if (parser.getCommands().get("-headless").equals("false")) {
+                    ChessGUI cg = new ChessGUI(game);
+                    JFrame f = new JFrame("ChessChamp");
+                    f.add(cg.getGui());
+                    // Ensures JVM closes after frame(s) closed
+                    f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                    // See https://stackoverflow.com/a/7143398/418556 for demo.
+                    f.setLocationByPlatform(true);
 
-                JFrame f = new JFrame("ChessChamp");
-                f.add(cg.getGui());
-                // Ensures JVM closes after frame(s) closed
-                f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                // See https://stackoverflow.com/a/7143398/418556 for demo.
-                f.setLocationByPlatform(true);
+                    // ensures the frame is the minimum size it needs to be
+                    // in order display the components within it
+                    f.pack();
+                    // ensures the minimum size is enforced.
+                    f.setMinimumSize(f.getSize());
+                    f.setVisible(true);
+                }
 
-                // ensures the frame is the minimum size it needs to be
-                // in order display the components within it
-                f.pack();
-                // ensures the minimum size is enforced.
-                f.setMinimumSize(f.getSize());
-                f.setVisible(true);
+                // Start new game if the first player is a bot
+                if (parser.getCommands().get("-player1").equals("bot"))
+                    game.startNewGame();
             }
         };
         // Swing GUIs should be created and updated on the EDT

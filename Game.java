@@ -4,25 +4,30 @@ import java.util.HashMap;
 import java.util.Stack;
 
 public class Game {
+    private boolean headless;
     private HashMap<String, Player> players = new HashMap<String, Player>();
-    private String playing = "White";
+    private String playing = "Black";
     public static Board chessBoard;
     private JLabel message;
     private Stack<String> history;
 
-    Game(String player1, String player2, String width, String height, String algorithm) {
+    Game(HashMap<String, String> commands) {
+        headless = commands.get("-headless").equals("true");
         // Builds ChessGUI.chessBoardTiles array
-        chessBoard = new Board(Integer.parseInt(width), Integer.parseInt(height), this);
+        chessBoard = new Board(Integer.parseInt(commands.get("-size")), Integer.parseInt(commands.get("-size")), this);
         // Creates 2 players as requested by args
-        Player white = player1.equals("bot") ? new BotPlayer(Color.WHITE, algorithm, chessBoard.tiles)
+        Player white = commands.get("-player1").equals("bot")
+                ? new BotPlayer(Color.WHITE, commands.get("-algorithm"), chessBoard.tiles)
                 : new HumanPlayer(Color.WHITE);
-        Player black = player2.equals("bot") ? new BotPlayer(Color.BLACK, algorithm, chessBoard.tiles)
+        Player black = commands.get("-player2").equals("bot")
+                ? new BotPlayer(Color.BLACK, commands.get("-algorithm"), chessBoard.tiles)
                 : new HumanPlayer(Color.BLACK);
         players.put("White", white);
         players.put("Black", black);
         // ChessGUI.message
         message = new JLabel();
         history = new Stack();
+
     }
 
     /*
@@ -120,8 +125,9 @@ public class Game {
         if (players.get(next).checkWinningCondition())
             endGame(next);
         if (players.get(next) instanceof BotPlayer)
-            letBotMakeItsMove();
-        playing = next;
+            letBotMakeItsMove(next);
+        else
+            playing = next;
     }
 
     /*
@@ -147,10 +153,10 @@ public class Game {
         findAllPaths();
 
         // initialize other variables
-        playing = "White";
         message.setText("Chess Champ is ready to play!");
         history.empty();
         history.push(chessBoard.encode());
+        switchPlayer();
     }
 
     /*
@@ -164,7 +170,8 @@ public class Game {
                 piece.findPaths();
     }
 
-    private void letBotMakeItsMove() {
+    private void letBotMakeItsMove(String next) {
+        this.playing = next;
         assert (players.get(playing) instanceof BotPlayer);
         BotPlayer bot = (BotPlayer) players.get(playing);
         // compute move
@@ -178,7 +185,7 @@ public class Game {
         findAllPaths();
         System.out.println(bot.move);
         // compute shot
-        if (bot.algorithm.equals("Random"))
+        if (bot.algorithm.equals("random"))
             bot.runAgain();
         // execute the shot
         // shoot at tile
@@ -210,9 +217,14 @@ public class Game {
      * Ends game by setting message to winner color and disabling input
      */
     public void endGame(String next) {
-        this.message.setText(next + " won");
-        // disable the board
-        chessBoard.disable();
+        if (this.headless) {
+            System.out.println(next + " has won the game.");
+            System.exit(0);
+        } else {
+            this.message.setText(next + " won");
+            // disable the board
+            chessBoard.disable();
+        }
     }
 
     public void endGame() {

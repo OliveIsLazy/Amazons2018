@@ -2,9 +2,8 @@ chessGUI => JPanel to represent the chess board
 HumanPlayer => Store data about itself
 Game => Store data about the game + main game loop that updates chessGUI
 
-TODO: 
+TODO:
     * Moves Logger option from command line (Gives UI a scrollable list of all previously played moves)
-    * UI enabled option for command line (Gives the possibility to take away UI i.e. go headless)
 
 Known bugs:
     * Some moves only get counted in some instances.

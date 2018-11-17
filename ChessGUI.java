@@ -79,6 +79,7 @@ public class ChessGUI {
         tools.setFloatable(false);
         gui.add(tools, BorderLayout.PAGE_START);
         Action newGameAction = new AbstractAction("New") {
+            private static final long serialVersionUID = 42L;
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -89,6 +90,7 @@ public class ChessGUI {
         tools.add(newGameAction);
         tools.addSeparator();
         Action newSaveAction = new AbstractAction("Save") {
+            private static final long serialVersionUID = 43L;
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -98,6 +100,7 @@ public class ChessGUI {
         };
         tools.add(newSaveAction);
         Action newLoadAction = new AbstractAction("Load Game") {
+            private static final long serialVersionUID = 44L;
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -107,6 +110,7 @@ public class ChessGUI {
         tools.add(newLoadAction);
         tools.addSeparator();
         Action newResignAction = new AbstractAction("Resign") {
+            private static final long serialVersionUID = 45L;
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -116,6 +120,7 @@ public class ChessGUI {
         tools.add(newResignAction);
         tools.addSeparator();
         Action newBackAction = new AbstractAction("Back") {
+            private static final long serialVersionUID = 46L;
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -132,6 +137,7 @@ public class ChessGUI {
     private final void makeChessBoard() {
         chessBoard = new JPanel(new GridLayout(BOARDSIZE + 2, 0)) { // + 2 because there's 2 columns and 2 rows on each
                                                                     // side of the board
+            private static final long serialVersionUID = 47L;
 
             /**
              * Override the preferred size to return the largest it can, in a square shape.

@@ -3,7 +3,12 @@ HumanPlayer => Store data about itself
 Game => Store data about the game + main game loop that updates chessGUI
 
 TODO:
-    * Moves Logger option from command line (Gives UI a scrollable list of all previously played moves)
+    * Add Machine Learning algorithms:
+        + K-nearest neighbors
+        + SVM
+        + Q-Learning (multiple versions)
+        + Genetic algorithm + neural network
+        + Capsule network (for the lolz)
 
 Known bugs:
     * Some moves only get counted in some instances.

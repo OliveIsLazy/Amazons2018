@@ -30,6 +30,7 @@ public class ArgParser {
     private String[] availableAlgorithms = new String[] { "random", "minimax", "rl" };
 
     public ArgParser() {
+        // Default Args
         addToArguments(player1, "human");
         addToArguments(player2, "human");
         addToArguments(size, "10");

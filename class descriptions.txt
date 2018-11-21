@@ -3,6 +3,7 @@ HumanPlayer => Store data about itself
 Game => Store data about the game + main game loop that updates chessGUI
 
 TODO:
+    * Change Algorithm implementations to return full board with the change made rather than just a single move
     * Add Machine Learning algorithms:
         + K-nearest neighbors
         + SVM

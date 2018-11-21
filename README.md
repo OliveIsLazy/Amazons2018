@@ -28,7 +28,7 @@
 
 #### TODO
 
-* Finalize Algorithm interface
+* Implement optional turns limit
 * Fix Minimax algorithm to implement Algorithm interface
 * Implement MCTS algorithm
 * Implement possibility to connect to other progarms

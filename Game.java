@@ -5,7 +5,7 @@ import java.util.Stack;
 
 public class Game {
     private boolean headless;
-    private HashMap<String, Player> players = new HashMap<String, Player>();
+    private HashMap<String, AbstractPlayer> players = new HashMap<String, AbstractPlayer>();
     private String playing = "Black";
     public static Board chessBoard;
     private JLabel message;
@@ -16,18 +16,17 @@ public class Game {
         // Builds ChessGUI.chessBoardTiles array
         chessBoard = new Board(Integer.parseInt(commands.get("-size")), Integer.parseInt(commands.get("-size")), this);
         // Creates 2 players as requested by args
-        Player white = commands.get("-player1").equals("bot")
-                ? new BotPlayer(Color.WHITE, commands.get("-algorithm"), chessBoard.tiles)
+        AbstractPlayer white = commands.get("-player1").equals("bot")
+                ? new BotPlayer(Color.WHITE, commands.get("-algorithm"), chessBoard)
                 : new HumanPlayer(Color.WHITE);
-        Player black = commands.get("-player2").equals("bot")
-                ? new BotPlayer(Color.BLACK, commands.get("-algorithm"), chessBoard.tiles)
+        AbstractPlayer black = commands.get("-player2").equals("bot")
+                ? new BotPlayer(Color.BLACK, commands.get("-algorithm"), chessBoard)
                 : new HumanPlayer(Color.BLACK);
         players.put("White", white);
         players.put("Black", black);
         // ChessGUI.message
         message = new JLabel();
         history = new Stack();
-
     }
 
     /*
@@ -174,27 +173,18 @@ public class Game {
         this.playing = next;
         assert (players.get(playing) instanceof BotPlayer);
         BotPlayer bot = (BotPlayer) players.get(playing);
-        // compute move
-        bot.run();
-        // execute the move
-        // remove pawn from current spot
-        Piece piece = chessBoard.tiles[bot.pawn.position.width][bot.pawn.position.height].removePiece();
-        // move it to next spot
-        chessBoard.tiles[bot.move.width][bot.move.height].setPiece(piece);
-        // compute all new moves
-        findAllPaths();
-        System.out.println(bot.move);
-        // compute shot
-        if (bot.algorithm.equals("random"))
-            bot.runAgain();
-        // execute the shot
-        // shoot at tile
-        chessBoard.tiles[bot.shot.width][bot.shot.height].shoot();
-        // compute all new moves
-        findAllPaths();
-        System.out.println(bot.shot);
-        // switch players
-        switchPlayer();
+        try {
+            // compute move
+            assert bot.run();
+            // compute all new moves
+            findAllPaths();
+            System.out.println(next + " bot has played.");
+            // switch players
+            switchPlayer();
+        } catch (AssertionError e) {
+            System.out.println("Bot Failed to run...");
+            System.exit(1);
+        }
     }
 
     /**
@@ -242,7 +232,7 @@ public class Game {
         return this.message;
     }
 
-    public final Player getPlayer(String color) {
+    public final AbstractPlayer getPlayer(String color) {
         return players.get(color);
     }
 

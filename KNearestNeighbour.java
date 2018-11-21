@@ -1,16 +1,14 @@
 import java.util.ArrayList;
+import java.util.Random;
 
-public class Minimax implements Algorithm {
+public class KNearestNeighbour implements Algorithm {
     private static ArrayList<Piece> pawns;
     private static Board board;
     private static Piece selectedPawn;
 
-    private static Tree tree;
-
-    Minimax(Board _board, ArrayList<Piece> _pawns) {
+    KNearestNeighbour(Board _board, ArrayList<Piece> _pawns) {
         pawns = _pawns;
         board = _board;
-        tree = new Tree();
     }
 
     @Override
@@ -30,4 +28,5 @@ public class Minimax implements Algorithm {
         // return result
         return board.encode();
     }
+
 }

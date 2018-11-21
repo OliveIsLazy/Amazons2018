@@ -4,63 +4,49 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.function.Supplier;
 
-public class BotPlayer extends Player {// implements Runnable{
+public class BotPlayer extends AbstractPlayer {
 
-    public Position move;
-    public Position shot;
-    public Piece pawn;
-    private HashMap<String, Supplier<ArrayList<Position>>> algorithms = new HashMap<>();
+    private HashMap<String, Supplier<String>> algorithms = new HashMap<>();
     public String algorithm;
-    private Random rand = new Random();
-    private GameTile[][] board;
+    private Algorithm brain;
+    private Board board;
 
-    BotPlayer(Color color, String algorithm, GameTile[][] board) {
+    BotPlayer(Color color, String algorithm, Board board) {
         super(color);
         this.algorithm = algorithm;
         this.board = board;
         algorithms.put("random", () -> runRandom());
         algorithms.put("miniMax", () -> runMiniMax());
-        // Add conversion from GameTile array to int array
+        algorithms.put("k_nearest", () -> runK_Nearest());
     }
 
     /*
      * input: void Method to be overriden to make new bots. Finds a random pawn from
      * the players' collection and makes a random move return: void
      */
-    public void run() {
-        ArrayList<Position> move_and_shot = algorithms.get(algorithm).get();
-        if (move_and_shot.size() == 2) {
-            this.move = move_and_shot.get(0);
-            this.shot = move_and_shot.get(1);
-        } else if (move_and_shot.size() < 2) {
-            this.move = move_and_shot.get(0);
-        } else {
-            System.out.println("There's a bug here");
-        }
+    public boolean run() {
+        // run the right algorithm
+        String newBoard = algorithms.get(algorithm).get();
+        // display the new board
+        return this.board.decode(newBoard);
     }
 
-    public void runAgain() {
-        ArrayList<Position> move_and_shot = algorithms.get(algorithm).get();
-        this.shot = move_and_shot.get(0);
+    public String runRandom() {
+        if (this.brain == null)
+            this.brain = new RandomMover(this.board, this.pawns);
+        return this.brain.findBestMove();
     }
 
-    public ArrayList<Position> runRandom() {
-        ArrayList<Position> returnValue = new ArrayList<Position>();
-        this.pawn = this.pawns.get(rand.nextInt(4));
-        returnValue.add(pawn.movesPool.get(rand.nextInt(pawn.movesPool.size())));
-        return returnValue;
+    public String runMiniMax() {
+        if (this.brain == null)
+            this.brain = new Minimax(this.board, this.pawns);
+        return this.brain.findBestMove();
     }
 
-    public ArrayList<Position> runMiniMax() {
-        ArrayList<Position> returnValue = new ArrayList<Position>();
-        MiniMax miniMax = new MiniMax(board, (color.equals(Color.BLACK)) ? "Black" : "White", 3);
-        for (Piece piece : this.pawns) {
-            if (piece.position.equals(miniMax.bestMove[0]))
-                this.pawn = piece;
-        }
-        returnValue.add(miniMax.bestMove[1]);
-        returnValue.add(miniMax.bestMove[2]);
-        return returnValue;
+    public String runK_Nearest() {
+        if (this.brain == null)
+            this.brain = new KNearestNeighbour(this.board, this.pawns);
+        return this.brain.findBestMove();
     }
 
 }

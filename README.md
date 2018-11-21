@@ -28,6 +28,7 @@
 
 #### TODO
 
+* Finalize Algorithm interface
 * Fix Minimax algorithm to implement Algorithm interface
 * Implement MCTS algorithm
 * Implement possibility to connect to other progarms

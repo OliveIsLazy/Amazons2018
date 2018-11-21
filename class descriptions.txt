@@ -1,15 +1,15 @@
 chessGUI => JPanel to represent the chess board
-HumanPlayer => Store data about itself
 Game => Store data about the game + main game loop that updates chessGUI
+Abstract/Human/BotPlayer => player representation
+Algorithm => interface to be implemented for a bot
 
 TODO:
-    * Change Algorithm implementations to return full board with the change made rather than just a single move
     * Add Machine Learning algorithms:
-        + K-nearest neighbors
-        + SVM
+        + K-nearest neighbors (?)
+        + SVM (?)
         + Q-Learning (multiple versions)
         + Genetic algorithm + neural network
-        + Capsule network (for the lolz)
+        + Capsule network (for the lolz its not gonna be good but its funny)
 
 Known bugs:
     * Some moves only get counted in some instances.

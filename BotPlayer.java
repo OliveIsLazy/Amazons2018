@@ -18,6 +18,7 @@ public class BotPlayer extends AbstractPlayer {
         algorithms.put("random", () -> runRandom());
         algorithms.put("miniMax", () -> runMiniMax());
         algorithms.put("k_nearest", () -> runK_Nearest());
+        algorithms.put("q_learning", () -> runPythonAlgorithm());
     }
 
     /*
@@ -47,6 +48,21 @@ public class BotPlayer extends AbstractPlayer {
         if (this.brain == null)
             this.brain = new KNearestNeighbour(this.board, this.pawns);
         return this.brain.findBestMove();
+    }
+
+    public String runPythonAlgorithm() {
+        if (this.brain == null) {
+            PythonAlgorithm brainThread = new PythonAlgorithm(this.board, this.algorithm);
+            brainThread.run();
+            this.brain = brainThread;
+        }
+        try {
+            return this.brain.findBestMove();
+        } catch (Exception e) {
+            System.out.println(e.getCause());
+            System.exit(2);
+            return null;
+        }
     }
 
 }

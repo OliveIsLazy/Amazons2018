@@ -2,3 +2,4 @@
 test.java
 .vscode
 *.amazons
+__pycache__

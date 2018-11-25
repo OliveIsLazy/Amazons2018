@@ -27,7 +27,7 @@ public class ArgParser {
     private String[] algorithm = new String[] { "-a", "-algorithm" };
     private String[] headless = new String[] { "-hd", "-headless" };
 
-    private String[] availableAlgorithms = new String[] { "random", "minimax", "rl" };
+    private String[] availableAlgorithms = new String[] { "random", "minimax", "q_learning" };
 
     public ArgParser() {
         // Default Args
@@ -88,7 +88,7 @@ public class ArgParser {
                 if (Arrays.stream(availableAlgorithms).anyMatch(args[i + 1]::equals))
                     addToArguments(algorithm, args[i + 1]);
                 else {
-                    printHelp("Algorithm does not exist or hasn't been implemented yet");
+                    printHelp("Algorithm " + args[i + 1] + " does not exist or hasn't been implemented yet");
                     return false;
                 }
                 break;
@@ -127,16 +127,6 @@ public class ArgParser {
 
     public HashMap<String, String> getCommands() {
         return this.commands;
-    }
-
-    public static void main(String[] args) {
-        ArgParser parser = new ArgParser();
-        boolean check = parser.parse(args);
-        try {
-            assert check;
-        } catch (AssertionError e) {
-            System.out.println("An assertion error occured.");
-        }
     }
 
 }

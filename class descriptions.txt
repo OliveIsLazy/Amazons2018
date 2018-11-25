@@ -1,7 +1,19 @@
-chessGUI => JPanel to represent the chess board
-Game => Store data about the game + main game loop that updates chessGUI
-Abstract/Human/BotPlayer => player representation
-Algorithm => interface to be implemented for a bot
+Way to run:
+    human v human -> java all the way
+    human v bot -> java all the way or java args + game logic -> python Brain
+    bot v bot -> java all the way or java args + game logic -> python Brain
+    bot learning -> java for args -> python for repetition -> java for game logic -> python Brain
+
+
+Java:
+    chessGUI => JPanel to represent the chess board
+    Game => Store data about the game + main game loop that updates chessGUI
+    Abstract/Human/BotPlayer => player representation
+    Algorithm => interface to be implemented for a bot
+
+Python:
+    Communicator => decodes pipe information from Java
+    Brain => handles decoded data and turns it into new move
 
 TODO:
     * Add Machine Learning algorithms:

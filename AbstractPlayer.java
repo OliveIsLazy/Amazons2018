@@ -31,9 +31,9 @@ public abstract class AbstractPlayer {
      */
     public boolean checkWinningCondition() {
         for (Piece piece : pawns)
-            if (piece.movesPool.isEmpty())
-                return true;
-        return false;
+            if (!piece.movesPool.isEmpty())
+                return false;
+        return true;
     }
 
 }

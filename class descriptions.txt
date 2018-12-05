@@ -16,7 +16,8 @@ Python:
     Brain => handles decoded data and turns it into new move
 
 TODO:
-    * Add Machine Learning algorithms:
+    * Send JSON to python algorithm and adjust response method to not decode board right away
+    * Add Machine Learning algorithms to MCTS:
         + K-nearest neighbors (?)
         + SVM (?)
         + Q-Learning (multiple versions)
@@ -27,3 +28,6 @@ Known bugs:
     * Some moves only get counted in some instances.
     * Starting new game does NOT reset all states for players
     * Loading an incompatible file adds unwanted arrows to the board
+    * When asked to select a shot, clicking on the moved pawn will cause buggy behavior
+    * Back button doesn't work against a bot
+

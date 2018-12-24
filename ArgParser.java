@@ -17,7 +17,7 @@ public class ArgParser {
     // after: java -ea runthis
 
     // before: java -ea runthis human bot 5 5 Minimax
-    // after: java -ea runthis -p2 -size 5 -a minimax
+    // after: java -ea runthis -p2 bot -size 5 -a minimax
 
     private HashMap<String, String> commands = new HashMap<String, String>();
 
@@ -27,7 +27,7 @@ public class ArgParser {
     private String[] algorithm = new String[] { "-a", "-algorithm" };
     private String[] headless = new String[] { "-hd", "-headless" };
 
-    private String[] availableAlgorithms = new String[] { "random", "minimax", "q_learning" };
+    private String[] availableAlgorithms = new String[] { "random", "minimax", "k_nearest", "mcts", "q_learning" };
 
     public ArgParser() {
         // Default Args

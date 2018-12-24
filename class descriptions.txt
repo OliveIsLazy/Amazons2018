@@ -31,3 +31,8 @@ Known bugs:
     * When asked to select a shot, clicking on the moved pawn will cause buggy behavior
     * Back button doesn't work against a bot
 
+
+
+
+MCTS:
+    * BUG TO FIX: Somehow, somewhere, pieces get overwritten with an arrow

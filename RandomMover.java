@@ -6,13 +6,11 @@ public class RandomMover implements Algorithm {
 
     private Random rand;
     private static ArrayList<Piece> pawns;
-    private static Board board;
     private static Piece selectedPawn;
 
-    RandomMover(Board _board, ArrayList<Piece> _pawns) {
+    RandomMover(ArrayList<Piece> _pawns) {
         rand = new Random();
         pawns = _pawns;
-        board = _board;
     }
 
     @Override
@@ -25,23 +23,24 @@ public class RandomMover implements Algorithm {
         // choose a pawn
         selectedPawn = this.pickPawn();
         // calculate its move and shot
-        Position move = selectedPawn.movesPool.get(rand.nextInt(selectedPawn.movesPool.size()));
-        Move(move);
+        Move move = selectedPawn.movesPool.get(rand.nextInt(selectedPawn.movesPool.size()));
+        perform(move);
         selectedPawn.findPaths();
-        Position shot = selectedPawn.movesPool.get(rand.nextInt(selectedPawn.movesPool.size()));
-        Shoot(shot);
+        move.findAllShots(Game.chessBoard.tiles, selectedPawn.position);
+        Position shot = move.shotsPool.get(rand.nextInt(move.shotsPool.size()));
+        shoot(shot);
         // return result
-        return board.encode();
+        return Game.chessBoard.encode();
     }
 
-    private void Move(Position move) {
-        selectedPawn = board.tiles[selectedPawn.position.width][selectedPawn.position.height].removePiece();
-        GameTile tile = board.tiles[move.width][move.height];
+    private void perform(Move move) {
+        selectedPawn = Game.chessBoard.tiles[selectedPawn.position.width][selectedPawn.position.height].removePiece();
+        GameTile tile = Game.chessBoard.tiles[move.position.width][move.position.height];
         tile.setPiece(selectedPawn);
     }
 
-    private void Shoot(Position shot) {
-        GameTile tile = board.tiles[shot.width][shot.height];
+    private void shoot(Position shot) {
+        GameTile tile = Game.chessBoard.tiles[shot.width][shot.height];
         tile.shoot();
     }
 }

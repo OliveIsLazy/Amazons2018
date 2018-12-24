@@ -1,7 +1,15 @@
-public class Tree {
-    /*
-     * This class implements a general definition for any tree based algorithm. If
-     * you need any specific features, add function to this class or make a new
-     * class that inherits from this one.
-     */
+public abstract class Tree {
+    public Node root;
+    String player;
+    String opponent;
+
+    Tree(String _player) {
+        this.root = new Node(_player);
+        this.player = _player;
+        this.opponent = Cycle.getOpponent(_player);
+    }
+
+    public void traverse() {
+        // use this to test if tree is empty
+    }
 }

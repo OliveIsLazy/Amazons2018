@@ -1,13 +1,14 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;;
+import java.util.ArrayList;
+import java.util.function.Supplier;
 
 public class Piece {
 
     Icon icon;
     Color color;
     Position position;
-    ArrayList<Position> movesPool = new ArrayList<Position>();
+    ArrayList<Move> movesPool = new ArrayList<Move>();
 
     Piece(Color c) {
         color = c;
@@ -18,8 +19,8 @@ public class Piece {
     }
 
     public void showPaths() {
-        for (Position pos : this.movesPool)
-            Game.chessBoard.tiles[pos.width][pos.height].changeColor(true);
+        for (Move move : this.movesPool)
+            Game.chessBoard.tiles[move.position.width][move.position.height].changeColor(true);
     }
 
     /*
@@ -27,52 +28,86 @@ public class Piece {
      * void
      */
     public void findPaths() {
-        movesPool.clear();
-        boolean top_flag, bottom_flag, right_flag, left_flag, bottom_right_flag, top_right_flag, bottom_left_flag,
-                top_left_flag;
-        top_flag = bottom_flag = right_flag = left_flag = bottom_right_flag = top_right_flag = bottom_left_flag = top_left_flag = false;
-        for (int i = 1; i < Game.chessBoard.tiles.length; i++) {
-            // vertical and horizontal paths
-            top_flag = conditionalAdditionToMovesPool(this.position.width - i, this.position.height,
-                    this.position.width - i >= 0, top_flag);
-            bottom_flag = conditionalAdditionToMovesPool(this.position.width + i, this.position.height,
-                    this.position.width + i < Game.chessBoard.tiles.length, bottom_flag);
-            right_flag = conditionalAdditionToMovesPool(this.position.width, this.position.height + i,
-                    this.position.height + i < Game.chessBoard.tiles[i].length, right_flag);
-            left_flag = conditionalAdditionToMovesPool(this.position.width, this.position.height - i,
-                    this.position.height - i >= 0, left_flag);
-            // diagonal paths
-            bottom_right_flag = conditionalAdditionToMovesPool(this.position.width + i, this.position.height + i,
-                    (this.position.width + i < Game.chessBoard.tiles.length
-                            && this.position.height + i < Game.chessBoard.tiles[i].length),
-                    bottom_right_flag);
-            top_right_flag = conditionalAdditionToMovesPool(this.position.width + i, this.position.height - i,
-                    (this.position.width + i < Game.chessBoard.tiles.length && this.position.height - i >= 0),
-                    top_right_flag);
-            bottom_left_flag = conditionalAdditionToMovesPool(this.position.width - i, this.position.height + i,
-                    (this.position.width - i >= 0 && this.position.height + i < Game.chessBoard.tiles[i].length),
-                    bottom_left_flag);
-            top_left_flag = conditionalAdditionToMovesPool(this.position.width - i, this.position.height - i,
-                    (this.position.width - i >= 0 && this.position.height - i > 0), top_left_flag);
+        movesPool = findAllMoves(Game.chessBoard.tiles, this.position, "Find Moves");
+    }
+
+    public static ArrayList<Move> findAllMoves(Object[][] gameBoard, Position piece, String intention) {
+        ArrayList<Move> moveList = new ArrayList<Move>();
+        boolean[] flags = new boolean[8];
+        for (int i = 1; i < gameBoard.length; i++) {
+            for (int index = 0; index < flags.length; index++) {
+            if(!check_flag(index, i, gameBoard, piece) || flags[index])
+                continue;
+            Position potentialMove = get_position(index, i, piece);
+            if(GameTile[][].class.equals(gameBoard.getClass()))
+                flags[index] = addMove((GameTile[][]) gameBoard, piece, potentialMove, moveList, intention);
+            else
+                flags[index] = addMove((String[][]) gameBoard, piece, potentialMove, moveList, intention);
+            }
+        }
+        return moveList;
+    }
+
+    public static boolean check_flag(int flag_index, int i, Object[][] gameBoard, Position piece){
+        switch(flag_index){
+            case 0: return piece.width - i >= 0;
+            case 1: return piece.width + i < gameBoard.length;
+            case 2: return piece.height + i < gameBoard[i].length;
+            case 3: return piece.height - i >= 0;
+            case 4: return piece.width + i < gameBoard.length && piece.height + i < gameBoard[i].length;
+            case 5: return piece.width + i < gameBoard.length && piece.height - i >= 0;
+            case 6: return piece.width - i >= 0 && piece.height + i < gameBoard[i].length;
+            case 7: return piece.width - i >= 0 && piece.height - i > 0;
+        }
+        return false;
+    }
+
+    public static Position get_position(int flag_index, int i, Position piece) {
+        switch(flag_index){
+            case 0: return new Position(piece.width - i, piece.height);
+            case 1: return new Position(piece.width + i, piece.height);
+            case 2: return new Position(piece.width, piece.height + i);
+            case 3: return new Position(piece.width, piece.height - i);
+            case 4: return new Position(piece.width + i, piece.height + i);
+            case 5: return new Position(piece.width + i, piece.height - i);
+            case 6: return new Position(piece.width - i, piece.height + i);
+            case 7: return new Position(piece.width - i, piece.height - i);
+        }
+        return null;
+    }
+
+    public static boolean addMove(GameTile[][] gameBoard, Position piece, Position potential, ArrayList<Move> list, String intention){
+        GameTile tile = gameBoard[potential.width][potential.height];
+        if (tile.hasPiece || tile.wasShot) {
+            return true;
+        } else {
+            Move move = new Move(tile.position);
+            if("Find Moves".equals(intention)){
+                move.findAllShots(gameBoard, piece);
+                if (!move.shotsPool.isEmpty())
+                    list.add(move);
+            } else {
+                list.add(move);
+            }
+            return false;
         }
     }
 
-    /*
-     * input: colum index of tile to check, row index of tile to check, boolean
-     * check if indices exist, stopping flag Adds tile at [i_index, j_index] to
-     * movesPool depending on whether index_check and flag are true and false
-     * respectively return: boolean that represents whether to stop the path in flag
-     * direction or not
-     */
-    boolean conditionalAdditionToMovesPool(int i_index, int j_index, boolean index_check, boolean flag) {
-        if (index_check && !flag) {
-            if (Game.chessBoard.tiles[i_index][j_index].hasPiece || Game.chessBoard.tiles[i_index][j_index].wasShot) {
-                return true;
+    public static boolean addMove(String[][] gameBoard, Position piece, Position potential, ArrayList<Move> list, String intention){
+        String tile = gameBoard[potential.width][potential.height];
+        if ("w".equals(tile) || "b".equals(tile) || "a".equals(tile)) {
+            return true;
+        } else {
+            Move move = new Move(potential);
+            if("Find Moves".equals(intention)){
+                move.findAllShots(gameBoard, piece);
+                if (!move.shotsPool.isEmpty())
+                    list.add(move);
             } else {
-                this.movesPool.add(Game.chessBoard.tiles[i_index][j_index].position);
+                list.add(move);
             }
+            return false;
         }
-        return flag;
     }
 
     // Setters

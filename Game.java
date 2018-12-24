@@ -6,7 +6,8 @@ import java.util.Stack;
 public class Game {
     private boolean headless;
     private HashMap<String, AbstractPlayer> players = new HashMap<String, AbstractPlayer>();
-    private String playing = "Black";
+    private Cycle playerCycle = new Cycle();
+    private String playing = playerCycle.player;
     public static Board chessBoard;
     private JLabel message;
     private Stack<String> history;
@@ -57,7 +58,7 @@ public class Game {
                 players.get(playing).selectedTile = tile;
                 tile.changeColor(false);
                 tile.piece.showPaths();
-            } else if (players.get(playing).selectedTile.piece.movesPool.contains(tile.position)) {
+            } else if (players.get(playing).selectedTile.piece.movesPool.contains(new Move(tile.position))) {
                 // Move piece to that tile
                 switch (players.get(playing).state) {
                 case "Moving":
@@ -115,14 +116,10 @@ public class Game {
      */
     private void switchPlayer() {
         history.push(chessBoard.encode());
-        String next = playing;
-        if (playing == "White")
-            next = "Black";
-        else if (playing == "Black")
-            next = "White";
+        String next = playerCycle.nextPlayer();
         message.setText(next + "\'s turn");
         if (players.get(next).checkWinningCondition())
-            endGame(next);
+            endGame(playing);
         if (players.get(next) instanceof BotPlayer)
             letBotMakeItsMove(next);
         else
@@ -183,6 +180,7 @@ public class Game {
             switchPlayer();
         } catch (AssertionError e) {
             System.out.println("Bot Failed to run...");
+            e.printStackTrace();
             System.exit(1);
         }
     }

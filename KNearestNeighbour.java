@@ -3,12 +3,10 @@ import java.util.Random;
 
 public class KNearestNeighbour implements Algorithm {
     private static ArrayList<Piece> pawns;
-    private static Board board;
     private static Piece selectedPawn;
 
-    KNearestNeighbour(Board _board, ArrayList<Piece> _pawns) {
+    KNearestNeighbour(ArrayList<Piece> _pawns) {
         pawns = _pawns;
-        board = _board;
     }
 
     @Override
@@ -26,7 +24,7 @@ public class KNearestNeighbour implements Algorithm {
          * move before choosing where to shoot
          */
         // return result
-        return board.encode();
+        return Game.chessBoard.encode();
     }
 
 }

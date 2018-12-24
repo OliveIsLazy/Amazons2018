@@ -16,8 +16,9 @@ public class BotPlayer extends AbstractPlayer {
         this.algorithm = algorithm;
         this.board = board;
         algorithms.put("random", () -> runRandom());
-        algorithms.put("miniMax", () -> runMiniMax());
+        algorithms.put("minimax", () -> runMiniMax());
         algorithms.put("k_nearest", () -> runK_Nearest());
+        algorithms.put("mcts", () -> runMCTS());
         algorithms.put("q_learning", () -> runPythonAlgorithm());
     }
 
@@ -34,25 +35,31 @@ public class BotPlayer extends AbstractPlayer {
 
     public String runRandom() {
         if (this.brain == null)
-            this.brain = new RandomMover(this.board, this.pawns);
+            this.brain = new RandomMover(this.pawns);
         return this.brain.findBestMove();
     }
 
     public String runMiniMax() {
         if (this.brain == null)
-            this.brain = new Minimax(this.board, this.pawns);
+            this.brain = new Minimax(this.pawns);
         return this.brain.findBestMove();
     }
 
     public String runK_Nearest() {
         if (this.brain == null)
-            this.brain = new KNearestNeighbour(this.board, this.pawns);
+            this.brain = new KNearestNeighbour(this.pawns);
+        return this.brain.findBestMove();
+    }
+
+    public String runMCTS() {
+        if (this.brain == null)
+            this.brain = new MonteCarloTreeSearch((this.color.equals(Color.BLACK) ? "Black" : "White"));
         return this.brain.findBestMove();
     }
 
     public String runPythonAlgorithm() {
         if (this.brain == null) {
-            PythonAlgorithm brainThread = new PythonAlgorithm(this.board, this.algorithm);
+            PythonAlgorithm brainThread = new PythonAlgorithm(this.algorithm, this.pawns);
             brainThread.run();
             this.brain = brainThread;
         }

@@ -1,15 +1,16 @@
 import java.io.BufferedReader;
+import java.util.ArrayList;
 import java.io.InputStreamReader;
 
 class PythonAlgorithm extends Thread implements Algorithm {
 
     String algorithm;
-    private static Board board;
+    ArrayList<Piece> pawns;
 
-    PythonAlgorithm(Board _board, String _algorithm) {
+    PythonAlgorithm(String _algorithm, ArrayList<Piece> _pawns) {
         super();
-        board = _board;
         this.algorithm = _algorithm;
+        this.pawns = _pawns;
     }
 
     @Override
@@ -19,7 +20,7 @@ class PythonAlgorithm extends Thread implements Algorithm {
 
     @Override
     public String findBestMove() {
-        String result = communicate(board);// .encode());
+        String result = communicate();
         System.out.println(result);
         if (result.equals(null)) {
             System.out.println("Something went wrong within the communication...");
@@ -40,8 +41,9 @@ class PythonAlgorithm extends Thread implements Algorithm {
         }
     }
 
-    private String communicate(Board board) {
-        ProcessBuilder communicatorBuilder = new ProcessBuilder("python", "communicator.py", board.encode());
+    private String communicate() {
+        this.getInputMoves();
+        ProcessBuilder communicatorBuilder = new ProcessBuilder("python", "communicator.py", Game.chessBoard.encode());
         communicatorBuilder.redirectErrorStream(true);
         String result = null;
         try {
@@ -72,7 +74,9 @@ class PythonAlgorithm extends Thread implements Algorithm {
         return result;
     }
 
-    public Board getBoard() {
-        return board;
+    private String getInputMoves() {
+        String input = ObjectToJSONConverter.convertPawns(this.pawns);
+        System.out.println(input);
+        return input;
     }
 }

@@ -2,15 +2,13 @@ import java.util.ArrayList;
 
 public class Minimax implements Algorithm {
     private static ArrayList<Piece> pawns;
-    private static Board board;
     private static Piece selectedPawn;
 
-    private static Tree tree;
+    // private static Tree tree;
 
-    Minimax(Board _board, ArrayList<Piece> _pawns) {
+    Minimax(ArrayList<Piece> _pawns) {
         pawns = _pawns;
-        board = _board;
-        tree = new Tree();
+        // tree = new Tree();
     }
 
     @Override
@@ -28,6 +26,6 @@ public class Minimax implements Algorithm {
          * move before choosing where to shoot
          */
         // return result
-        return board.encode();
+        return Game.chessBoard.encode();
     }
 }
